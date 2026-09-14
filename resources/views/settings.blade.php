@@ -66,6 +66,12 @@
             <hr class="my-4">
 
             <div class="mb-4">
+                <label class="font-bold text-sm block mb-1">Botão flutuante (JSON)</label>
+                <textarea name="button_json" rows="12" class="input-text font-mono text-xs">{{ json_encode($settings['button'] ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</textarea>
+                <p class="help-block">Configura label, posição, cores, sombra e ícone do botão de preferências.</p>
+            </div>
+
+            <div class="mb-4">
                 <label class="font-bold text-sm block mb-1">Grupos de cookies (JSON)</label>
                 <textarea name="groups_json" rows="16" class="input-text font-mono text-xs">{{ json_encode($settings['groups'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</textarea>
                 <p class="help-block">

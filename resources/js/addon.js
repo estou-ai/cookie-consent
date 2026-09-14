@@ -20,7 +20,7 @@ function boot() {
     const config = JSON.parse(bannerEl.dataset.config);
     const store = new ConsentStore(config);
 
-    defineButtonElement();
+    defineButtonElement(config, store);
     bootConsentMode(config, store);
     bootConsentLog(config);
     bootDomGate(store);

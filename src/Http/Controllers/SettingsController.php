@@ -30,13 +30,15 @@ class SettingsController extends Controller
             'theme' => 'required|string',
             'text' => 'required|array',
             'consent_mode' => 'required|array',
+            'button_json' => 'required|json',
             'groups_json' => 'required|json',
         ]);
 
         $data['enabled'] = $request->boolean('enabled');
+        $data['button'] = json_decode($data['button_json'], true, flags: JSON_THROW_ON_ERROR);
         $data['groups'] = json_decode($data['groups_json'], true, flags: JSON_THROW_ON_ERROR);
         $site = $data['site'];
-        unset($data['groups_json'], $data['site']);
+        unset($data['button_json'], $data['groups_json'], $data['site']);
 
         $settings->save($data, $site);
 

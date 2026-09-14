@@ -34,6 +34,20 @@ return [
     'position' => 'bottom', // bottom | top | bottom-left | bottom-right
     'theme' => 'auto', // auto | light | dark
 
+    'button' => [
+        'enabled' => true,
+        'label' => 'Cookies',
+        'aria_label' => 'Preferências de cookies',
+        'position' => 'bottom-left', // bottom-left | bottom-right | top-left | top-right
+        'background' => '#ffffff',
+        'foreground' => '#6b7280',
+        'border' => 'rgba(99, 102, 241, 0.16)',
+        'shadow' => '0 8px 24px rgba(0, 0, 0, 0.16)',
+        'icon' => 'cookie', // cookie | none | any HTML/SVG string
+        'icon_background' => '#6366f1',
+        'icon_foreground' => '#ffffff',
+    ],
+
     'groups' => [
         'necessary' => [
             'name' => 'Necessários',

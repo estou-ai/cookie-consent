@@ -364,8 +364,32 @@ Important keys:
 - `text`
 - `position`
 - `theme`
+- `button`
 - `groups`
 - `consent_mode`
+
+### Floating preferences button
+
+`button` controls `{{ cookie_consent:button }}`:
+
+```php
+'button' => [
+    'enabled' => true,
+    'label' => 'Cookies',
+    'aria_label' => 'Cookie preferences',
+    'position' => 'bottom-right', // bottom-left | bottom-right | top-left | top-right
+    'background' => '#ffffff',
+    'foreground' => '#6b7280',
+    'border' => 'rgba(1, 57, 131, 0.12)',
+    'shadow' => '0 8px 24px rgba(1, 57, 131, 0.16)',
+    'icon' => 'cookie', // cookie | none | custom HTML/SVG string
+    'icon_background' => '#013983',
+    'icon_foreground' => '#ffffff',
+],
+```
+
+When the banner is open, the button hides automatically so it cannot overlap
+the dialog. Before first consent, it also stays hidden while the banner is visible.
 
 ## License
 
