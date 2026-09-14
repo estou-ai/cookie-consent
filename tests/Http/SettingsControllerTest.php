@@ -38,7 +38,13 @@ class SettingsControllerTest extends TestCase
         $blueprint = $response->viewData('blueprint');
 
         $this->assertArrayHasKey('tabs', $blueprint);
-        $fields = collect($blueprint['tabs'])->flatMap->sections->flatMap->fields;
+        $sections = collect($blueprint['tabs'])->flatMap->sections;
+        $this->assertSame(
+            ['General', 'Appearance', 'Banner text', 'Floating button', 'Cookie groups'],
+            $sections->pluck('display')->all()
+        );
+
+        $fields = $sections->flatMap->fields;
         $this->assertSame(
             ['enabled', 'version', 'position', 'theme', 'text', 'button', 'groups'],
             $fields->pluck('handle')->all()

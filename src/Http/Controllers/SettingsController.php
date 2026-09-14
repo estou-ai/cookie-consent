@@ -49,6 +49,8 @@ class SettingsController extends Controller
 
     protected function blueprint(): Blueprint
     {
-        return Blueprint::make()->setContents(['fields' => CookieConsentBlueprint::fields()]);
+        return Blueprint::make()->setContents([
+            'tabs' => ['main' => ['sections' => CookieConsentBlueprint::sections()]],
+        ]);
     }
 }

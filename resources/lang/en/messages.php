@@ -7,6 +7,9 @@
 // use). Add resources/lang/{locale}/messages.php with the same keys for
 // another CP language; nothing else needs to change.
 return [
+    'section_general' => 'General',
+    'section_appearance' => 'Appearance',
+
     'enabled' => 'Enable',
     'enabled_instructions' => 'Off: no banner appears and every group-gated block of content is treated as allowed.',
 
