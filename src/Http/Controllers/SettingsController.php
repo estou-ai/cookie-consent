@@ -15,12 +15,16 @@ class SettingsController extends Controller
     {
         $site = $request->query('site', Site::current()->handle());
 
-        $fields = $this->fields()
+        $blueprint = $this->blueprint();
+        $fields = $blueprint->fields()
             ->addValues(CookieConsentBlueprint::toEditable($settings->all($site)))
             ->preProcess();
 
         return view('cookie-consent::settings', [
-            'blueprint' => $fields->toPublishArray(),
+            // Blueprint::toPublishArray() (title/handle/tabs), not
+            // Fields::toPublishArray() (a flat field list) — PublishForm's
+            // Container/Tabs expect the former.
+            'blueprint' => $blueprint->toPublishArray(),
             'values' => $fields->values()->all(),
             'meta' => $fields->meta(),
             'site' => $site,
@@ -35,7 +39,7 @@ class SettingsController extends Controller
     {
         $site = $request->query('site', Site::current()->handle());
 
-        $fields = $this->fields()->addValues($request->all());
+        $fields = $this->blueprint()->fields()->addValues($request->all());
         $fields->validate();
 
         $settings->save(CookieConsentBlueprint::toStorage($fields->process()->values()->all()), $site);
@@ -43,8 +47,8 @@ class SettingsController extends Controller
         return response()->json([]);
     }
 
-    protected function fields()
+    protected function blueprint(): Blueprint
     {
-        return Blueprint::make()->setContents(['fields' => CookieConsentBlueprint::fields()])->fields();
+        return Blueprint::make()->setContents(['fields' => CookieConsentBlueprint::fields()]);
     }
 }

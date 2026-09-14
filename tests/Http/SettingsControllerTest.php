@@ -27,6 +27,24 @@ class SettingsControllerTest extends TestCase
         parent::tearDown();
     }
 
+    // PublishForm's Container/Tabs need Blueprint::toPublishArray()'s shape
+    // (title/handle/tabs) — passing Fields::toPublishArray()'s flat field
+    // list instead (an easy mix-up, both classes have the same method name)
+    // renders a blank screen and crashes Tabs' setup().
+    public function test_index_exposes_blueprint_as_tabs_not_a_flat_field_list()
+    {
+        $response = $this->get(cp_route('cookie-consent.index'))->assertOk();
+
+        $blueprint = $response->viewData('blueprint');
+
+        $this->assertArrayHasKey('tabs', $blueprint);
+        $fields = collect($blueprint['tabs'])->flatMap->sections->flatMap->fields;
+        $this->assertSame(
+            ['enabled', 'version', 'position', 'theme', 'text', 'button', 'groups'],
+            $fields->pluck('handle')->all()
+        );
+    }
+
     public function test_index_exposes_groups_as_a_list_keyed_by_handle_field()
     {
         $response = $this->get(cp_route('cookie-consent.index'))->assertOk();
