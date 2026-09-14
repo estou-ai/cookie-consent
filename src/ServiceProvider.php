@@ -9,8 +9,12 @@ use Statamic\Statamic;
 
 class ServiceProvider extends AddonServiceProvider
 {
+    // Both entries publish/build together, but only `addon.js` is ever handed
+    // to visitors (see CookieConsentTags::scripts()) — `cp.js` (the settings
+    // screen's Vue component) reaches the browser only via this CP-only
+    // registration, same as it already loading `addon.js` here too.
     protected $vite = [
-        'input' => ['resources/js/addon.js'],
+        'input' => ['resources/js/addon.js', 'resources/js/cp.js'],
     ];
 
     protected $routes = [
@@ -52,7 +56,7 @@ class ServiceProvider extends AddonServiceProvider
         Nav::extend(function ($nav) {
             $nav->tools('Cookie Consent')
                 ->route('cookie-consent.index')
-                ->icon('cookie')
+                ->icon('security-lock')
                 ->can('manage cookie consent settings');
         });
     }

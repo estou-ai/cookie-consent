@@ -6,7 +6,7 @@ export default defineConfig({
     plugins: [
         statamic(),
         laravel({
-            input: ['resources/js/addon.js'],
+            input: ['resources/js/addon.js', 'resources/js/cp.js'],
             hotFile: 'public/hot',
             buildDirectory: 'build',
             refresh: false,

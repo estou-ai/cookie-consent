@@ -2,10 +2,12 @@
 
 namespace Estouai\CookieConsent\Http\Controllers;
 
+use Estouai\CookieConsent\Settings\CookieConsentBlueprint;
 use Estouai\CookieConsent\Settings\CookieConsentSettings;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Statamic\Facades\Site;
+use Statamic\Fields\Blueprint;
 
 class SettingsController extends Controller
 {
@@ -13,35 +15,36 @@ class SettingsController extends Controller
     {
         $site = $request->query('site', Site::current()->handle());
 
+        $fields = $this->fields()
+            ->addValues(CookieConsentBlueprint::toEditable($settings->all($site)))
+            ->preProcess();
+
         return view('cookie-consent::settings', [
-            'settings' => $settings->all($site),
+            'blueprint' => $fields->toPublishArray(),
+            'values' => $fields->values()->all(),
+            'meta' => $fields->meta(),
             'site' => $site,
             'sites' => Site::all(),
         ]);
     }
 
+    // PublishForm's save pipeline POSTs the container's flat field values
+    // directly as the JSON body (no wrapper key) — confirmed by reading the
+    // compiled @statamic/cms/ui bundle's Request/Container save logic.
     public function update(Request $request, CookieConsentSettings $settings)
     {
-        $data = $request->validate([
-            'site' => 'required|string',
-            'enabled' => 'boolean',
-            'version' => 'required|integer|min:1',
-            'position' => 'required|string',
-            'theme' => 'required|string',
-            'text' => 'required|array',
-            'consent_mode' => 'required|array',
-            'button_json' => 'required|json',
-            'groups_json' => 'required|json',
-        ]);
+        $site = $request->query('site', Site::current()->handle());
 
-        $data['enabled'] = $request->boolean('enabled');
-        $data['button'] = json_decode($data['button_json'], true, flags: JSON_THROW_ON_ERROR);
-        $data['groups'] = json_decode($data['groups_json'], true, flags: JSON_THROW_ON_ERROR);
-        $site = $data['site'];
-        unset($data['button_json'], $data['groups_json'], $data['site']);
+        $fields = $this->fields()->addValues($request->all());
+        $fields->validate();
 
-        $settings->save($data, $site);
+        $settings->save(CookieConsentBlueprint::toStorage($fields->process()->values()->all()), $site);
 
-        return back()->with('success', 'Configurações de cookies salvas.');
+        return response()->json([]);
+    }
+
+    protected function fields()
+    {
+        return Blueprint::make()->setContents(['fields' => CookieConsentBlueprint::fields()])->fields();
     }
 }
