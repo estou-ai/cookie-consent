@@ -7,7 +7,6 @@
         :initial-meta="meta"
         :submit-url="submitUrl"
         submit-method="post"
-        as-config
     />
 </template>
 
