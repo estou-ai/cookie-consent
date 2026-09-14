@@ -3,8 +3,8 @@
         icon="security-lock"
         title="Cookie Consent"
         :blueprint="blueprint"
-        :values="values"
-        :meta="meta"
+        :initial-values="values"
+        :initial-meta="meta"
         :submit-url="submitUrl"
         submit-method="post"
         as-config
