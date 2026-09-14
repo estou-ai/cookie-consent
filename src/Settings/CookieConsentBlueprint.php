@@ -2,6 +2,8 @@
 
 namespace Estouai\CookieConsent\Settings;
 
+use function Statamic\trans as __;
+
 // Bridges the CP's blueprint-editable shape (a `groups` replicator, one row
 // per group) and the shape actually stored on disk and read by
 // CookieConsentTags (`groups` keyed by handle, with a sibling `consent_mode`
@@ -9,6 +11,10 @@ namespace Estouai\CookieConsent\Settings;
 // field (enabled/version/position/theme/text/button) round-trips as-is: the
 // `group` fieldtype already stores/returns nested arrays under one handle,
 // identical to how `text`/`button` are already shaped in config.
+//
+// Field labels/instructions live in resources/lang/{locale}/messages.php
+// (cookie-consent::messages.*) — add another locale file with the same keys
+// to translate the settings screen; nothing here needs to change.
 class CookieConsentBlueprint
 {
     // Google Consent Mode v2 signals — see
@@ -23,86 +29,109 @@ class CookieConsentBlueprint
         'security_storage' => 'security_storage',
     ];
 
-    protected const LEGAL_BASIS_OPTIONS = [
-        'consentimento' => 'Consentimento',
-        'legitimo_interesse' => 'Legítimo interesse',
-        'obrigacao_legal' => 'Obrigação legal',
-    ];
-
     public static function fields(): array
     {
         return [
             ['handle' => 'enabled', 'field' => [
-                'type' => 'toggle', 'display' => 'Ativar',
-                'instructions' => 'Desativado: nenhum banner aparece e todo conteúdo condicionado a grupos é tratado como permitido.',
+                'type' => 'toggle', 'display' => __('cookie-consent::messages.enabled'),
+                'instructions' => __('cookie-consent::messages.enabled_instructions'),
             ]],
             ['handle' => 'version', 'field' => [
-                'type' => 'integer', 'display' => 'Versão do consentimento', 'validate' => 'required|integer|min:1',
-                'instructions' => 'Aumente esse número para forçar todos os visitantes a decidir de novo.',
+                'type' => 'integer', 'display' => __('cookie-consent::messages.version'), 'validate' => 'required|integer|min:1',
+                'instructions' => __('cookie-consent::messages.version_instructions'),
             ]],
             ['handle' => 'position', 'field' => [
-                'type' => 'select', 'display' => 'Posição do banner',
-                'options' => ['bottom' => 'Inferior', 'top' => 'Superior', 'bottom-left' => 'Inferior esquerda', 'bottom-right' => 'Inferior direita'],
+                'type' => 'select', 'display' => __('cookie-consent::messages.position'),
+                'options' => [
+                    'bottom' => __('cookie-consent::messages.position_bottom'),
+                    'top' => __('cookie-consent::messages.position_top'),
+                    'bottom-left' => __('cookie-consent::messages.position_bottom_left'),
+                    'bottom-right' => __('cookie-consent::messages.position_bottom_right'),
+                ],
             ]],
             ['handle' => 'theme', 'field' => [
-                'type' => 'select', 'display' => 'Tema',
-                'options' => ['auto' => 'Automático (sistema)', 'light' => 'Claro', 'dark' => 'Escuro'],
+                'type' => 'select', 'display' => __('cookie-consent::messages.theme'),
+                'options' => [
+                    'auto' => __('cookie-consent::messages.theme_auto'),
+                    'light' => __('cookie-consent::messages.theme_light'),
+                    'dark' => __('cookie-consent::messages.theme_dark'),
+                ],
             ]],
             ['handle' => 'text', 'field' => [
-                'type' => 'group', 'display' => 'Textos do banner', 'fields' => [
-                    ['handle' => 'title', 'field' => ['type' => 'text', 'display' => 'Título']],
-                    ['handle' => 'description', 'field' => ['type' => 'textarea', 'display' => 'Descrição']],
-                    ['handle' => 'accept_all', 'field' => ['type' => 'text', 'display' => 'Botão aceitar tudo']],
-                    ['handle' => 'reject_all', 'field' => ['type' => 'text', 'display' => 'Botão rejeitar']],
-                    ['handle' => 'customize', 'field' => ['type' => 'text', 'display' => 'Botão personalizar']],
-                    ['handle' => 'save', 'field' => ['type' => 'text', 'display' => 'Botão salvar preferências']],
-                    ['handle' => 'privacy_policy_label', 'field' => ['type' => 'text', 'display' => 'Rótulo do link da política']],
-                    ['handle' => 'privacy_policy_url', 'field' => ['type' => 'text', 'display' => 'URL da política de privacidade']],
+                'type' => 'group', 'display' => __('cookie-consent::messages.text'), 'fields' => [
+                    ['handle' => 'title', 'field' => ['type' => 'text', 'display' => __('cookie-consent::messages.text_title')]],
+                    ['handle' => 'description', 'field' => ['type' => 'textarea', 'display' => __('cookie-consent::messages.text_description')]],
+                    ['handle' => 'accept_all', 'field' => ['type' => 'text', 'display' => __('cookie-consent::messages.text_accept_all')]],
+                    ['handle' => 'reject_all', 'field' => ['type' => 'text', 'display' => __('cookie-consent::messages.text_reject_all')]],
+                    ['handle' => 'customize', 'field' => ['type' => 'text', 'display' => __('cookie-consent::messages.text_customize')]],
+                    ['handle' => 'save', 'field' => ['type' => 'text', 'display' => __('cookie-consent::messages.text_save')]],
+                    ['handle' => 'privacy_policy_label', 'field' => ['type' => 'text', 'display' => __('cookie-consent::messages.text_privacy_policy_label')]],
+                    ['handle' => 'privacy_policy_url', 'field' => ['type' => 'text', 'display' => __('cookie-consent::messages.text_privacy_policy_url')]],
                 ],
             ]],
             ['handle' => 'button', 'field' => [
-                'type' => 'group', 'display' => 'Botão flutuante',
-                'instructions' => 'Configura o botão de preferências que fica sempre visível depois da primeira decisão.',
+                'type' => 'group', 'display' => __('cookie-consent::messages.button'),
+                'instructions' => __('cookie-consent::messages.button_instructions'),
                 'fields' => [
-                    ['handle' => 'enabled', 'field' => ['type' => 'toggle', 'display' => 'Ativar']],
-                    ['handle' => 'label', 'field' => ['type' => 'text', 'display' => 'Rótulo']],
-                    ['handle' => 'aria_label', 'field' => ['type' => 'text', 'display' => 'Aria label']],
+                    ['handle' => 'enabled', 'field' => ['type' => 'toggle', 'display' => __('cookie-consent::messages.button_enabled')]],
+                    ['handle' => 'label', 'field' => ['type' => 'text', 'display' => __('cookie-consent::messages.button_label')]],
+                    ['handle' => 'aria_label', 'field' => ['type' => 'text', 'display' => __('cookie-consent::messages.button_aria_label')]],
                     ['handle' => 'position', 'field' => [
-                        'type' => 'select', 'display' => 'Posição',
-                        'options' => ['bottom-left' => 'Inferior esquerda', 'bottom-right' => 'Inferior direita', 'top-left' => 'Superior esquerda', 'top-right' => 'Superior direita'],
+                        'type' => 'select', 'display' => __('cookie-consent::messages.button_position'),
+                        'options' => [
+                            'bottom-left' => __('cookie-consent::messages.position_bottom_left'),
+                            'bottom-right' => __('cookie-consent::messages.position_bottom_right'),
+                            'top-left' => __('cookie-consent::messages.button_position_top_left'),
+                            'top-right' => __('cookie-consent::messages.button_position_top_right'),
+                        ],
                     ]],
-                    ['handle' => 'background', 'field' => ['type' => 'color', 'display' => 'Cor de fundo']],
-                    ['handle' => 'foreground', 'field' => ['type' => 'color', 'display' => 'Cor do texto']],
+                    ['handle' => 'background', 'field' => ['type' => 'color', 'display' => __('cookie-consent::messages.button_background')]],
+                    ['handle' => 'foreground', 'field' => ['type' => 'color', 'display' => __('cookie-consent::messages.button_foreground')]],
                     // Plain text, not `color`: these are raw CSS values (rgba()/box-shadow
                     // strings, or an SVG string), and Color's config only picks a hex value.
-                    ['handle' => 'border', 'field' => ['type' => 'text', 'display' => 'Borda (CSS)']],
-                    ['handle' => 'shadow', 'field' => ['type' => 'text', 'display' => 'Sombra (CSS)']],
-                    ['handle' => 'icon', 'field' => ['type' => 'text', 'display' => 'Ícone', 'instructions' => '`cookie`, `none`, ou um SVG.']],
-                    ['handle' => 'icon_background', 'field' => ['type' => 'color', 'display' => 'Cor de fundo do ícone']],
-                    ['handle' => 'icon_foreground', 'field' => ['type' => 'color', 'display' => 'Cor do ícone']],
+                    ['handle' => 'border', 'field' => ['type' => 'text', 'display' => __('cookie-consent::messages.button_border')]],
+                    ['handle' => 'shadow', 'field' => ['type' => 'text', 'display' => __('cookie-consent::messages.button_shadow')]],
+                    ['handle' => 'icon', 'field' => [
+                        'type' => 'text', 'display' => __('cookie-consent::messages.button_icon'),
+                        'instructions' => __('cookie-consent::messages.button_icon_instructions'),
+                    ]],
+                    ['handle' => 'icon_background', 'field' => ['type' => 'color', 'display' => __('cookie-consent::messages.button_icon_background')]],
+                    ['handle' => 'icon_foreground', 'field' => ['type' => 'color', 'display' => __('cookie-consent::messages.button_icon_foreground')]],
                 ],
             ]],
             ['handle' => 'groups', 'field' => [
-                'type' => 'replicator', 'display' => 'Grupos de cookies',
+                'type' => 'replicator', 'display' => __('cookie-consent::messages.groups'),
                 'sets' => ['group' => ['fields' => [
                     ['handle' => 'handle', 'field' => [
-                        'type' => 'text', 'display' => 'Chave', 'validate' => 'required|alpha_dash',
-                        'instructions' => 'Identificador técnico, ex.: `analytics`. Usado por `consent_mode` e `{{ cookie_consent:allowed group="" }}`.',
+                        'type' => 'text', 'display' => __('cookie-consent::messages.group_handle'), 'validate' => 'required|alpha_dash',
+                        'instructions' => __('cookie-consent::messages.group_handle_instructions'),
                     ]],
-                    ['handle' => 'name', 'field' => ['type' => 'text', 'display' => 'Nome', 'validate' => 'required']],
-                    ['handle' => 'description', 'field' => ['type' => 'textarea', 'display' => 'Descrição']],
-                    ['handle' => 'required', 'field' => ['type' => 'toggle', 'display' => 'Obrigatório', 'instructions' => 'Não pode ser desligado pelo visitante.']],
-                    ['handle' => 'default', 'field' => ['type' => 'toggle', 'display' => 'Ativo por omissão']],
-                    ['handle' => 'legal_basis', 'field' => ['type' => 'select', 'display' => 'Base legal (RGPD/LGPD)', 'options' => self::LEGAL_BASIS_OPTIONS]],
+                    ['handle' => 'name', 'field' => ['type' => 'text', 'display' => __('cookie-consent::messages.group_name'), 'validate' => 'required']],
+                    ['handle' => 'description', 'field' => ['type' => 'textarea', 'display' => __('cookie-consent::messages.group_description')]],
+                    ['handle' => 'required', 'field' => [
+                        'type' => 'toggle', 'display' => __('cookie-consent::messages.group_required'),
+                        'instructions' => __('cookie-consent::messages.group_required_instructions'),
+                    ]],
+                    ['handle' => 'default', 'field' => ['type' => 'toggle', 'display' => __('cookie-consent::messages.group_default')]],
+                    ['handle' => 'legal_basis', 'field' => [
+                        'type' => 'select', 'display' => __('cookie-consent::messages.group_legal_basis'),
+                        // Values are the stored data (consumed by tags/README as-is), not
+                        // translated — only their display labels are.
+                        'options' => [
+                            'consentimento' => __('cookie-consent::messages.legal_basis_consent'),
+                            'legitimo_interesse' => __('cookie-consent::messages.legal_basis_legitimate_interest'),
+                            'obrigacao_legal' => __('cookie-consent::messages.legal_basis_legal_obligation'),
+                        ],
+                    ]],
                     ['handle' => 'consent_mode', 'field' => [
-                        'type' => 'checkboxes', 'display' => 'Sinais do Google Consent Mode',
+                        'type' => 'checkboxes', 'display' => __('cookie-consent::messages.group_consent_mode'),
                         'options' => self::CONSENT_MODE_SIGNALS,
                     ]],
                     ['handle' => 'cookies', 'field' => [
-                        'type' => 'grid', 'display' => 'Cookies', 'fields' => [
-                            ['handle' => 'name', 'field' => ['type' => 'text', 'display' => 'Nome', 'width' => 33]],
-                            ['handle' => 'purpose', 'field' => ['type' => 'text', 'display' => 'Finalidade', 'width' => 34]],
-                            ['handle' => 'retention', 'field' => ['type' => 'text', 'display' => 'Retenção', 'width' => 33]],
+                        'type' => 'grid', 'display' => __('cookie-consent::messages.group_cookies'), 'fields' => [
+                            ['handle' => 'name', 'field' => ['type' => 'text', 'display' => __('cookie-consent::messages.cookie_name'), 'width' => 33]],
+                            ['handle' => 'purpose', 'field' => ['type' => 'text', 'display' => __('cookie-consent::messages.cookie_purpose'), 'width' => 34]],
+                            ['handle' => 'retention', 'field' => ['type' => 'text', 'display' => __('cookie-consent::messages.cookie_retention'), 'width' => 33]],
                         ],
                     ]],
                 ]]],

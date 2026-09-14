@@ -43,6 +43,10 @@ class SettingsControllerTest extends TestCase
             ['enabled', 'version', 'position', 'theme', 'text', 'button', 'groups'],
             $fields->pluck('handle')->all()
         );
+        // Labels come from resources/lang/en/messages.php via
+        // cookie-consent::messages.* — this only resolves in English if the
+        // addon's lang directory actually got auto-loaded under that namespace.
+        $this->assertSame('Enable', $fields->firstWhere('handle', 'enabled')['display']);
     }
 
     public function test_index_exposes_groups_as_a_list_keyed_by_handle_field()
