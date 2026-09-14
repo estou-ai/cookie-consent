@@ -36,7 +36,11 @@
     "extra": {
         "statamic": {
             "name": "Cookie Consent",
-            "description": "RGPD/GDPR-first cookie consent banner with consent logging, content gating, and Consent Mode integration"
+            "description": "RGPD/GDPR-first cookie consent banner with consent logging, content gating, and Consent Mode integration",
+            "editions": [
+                "free",
+                "pro"
+            ]
         },
         "laravel": {
             "providers": [
