@@ -4,6 +4,7 @@ namespace Estouai\CookieConsent\Tags;
 
 use Estouai\CookieConsent\Settings\CookieConsentSettings;
 use Illuminate\Foundation\Vite;
+use Statamic\Facades\Addon;
 use Statamic\Tags\Tags;
 
 // {{ cookie_consent }} / {{ cookie_consent:button }} / {{ cookie_consent:scripts }}
@@ -143,7 +144,12 @@ class CookieConsentTags extends Tags
         // log_url isn't part of $settings (that's what the CP screen
         // saves/loads) — computed fresh each render so it always matches the
         // action route's actual URL (host, `statamic.routes.action` prefix).
-        $config = $this->settings() + ['log_url' => route('statamic.cookie-consent.log')];
+        // is_pro likewise: resolved from config('statamic.editions.addons')
+        // so the JS bundle can drop the "Powered by" branding on pro installs.
+        $config = $this->settings() + [
+            'log_url' => route('statamic.cookie-consent.log'),
+            'is_pro' => Addon::get('estouai/cookie-consent')?->edition() === 'pro',
+        ];
 
         return e(json_encode($config, JSON_UNESCAPED_UNICODE));
     }

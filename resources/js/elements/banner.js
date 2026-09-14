@@ -93,7 +93,7 @@ export function defineBannerElement(store) {
                                <button part="button" data-action="reject">${config.text.reject_all}</button>
                                <button part="button" data-action="accept">${config.text.accept_all}</button>`}
                     </div>
-                    <p part="branding" class="branding">Powered by <a href="https://estou.ai" target="_blank" rel="noopener">estou.ai</a></p>
+                    ${config.is_pro ? '' : `<p part="branding" class="branding">Powered by <a href="https://estou.ai" target="_blank" rel="noopener">estou.ai</a></p>`}
                 </div>`;
 
             this.shadowRoot.querySelectorAll('[data-action]').forEach((button) => {
