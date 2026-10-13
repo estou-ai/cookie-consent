@@ -36,7 +36,7 @@ function activateTaggedNodes(groups) {
 
 export function bootConsentMode(config, store) {
     window.dataLayer = window.dataLayer || [];
-    const gtag = (...args) => window.dataLayer.push(args);
+    function gtag() { window.dataLayer.push(arguments); }
 
     const push = (groups) => {
         gtag('consent', 'update', signalsFor(config, groups));
