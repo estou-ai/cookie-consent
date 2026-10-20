@@ -83,6 +83,13 @@ return [
 
     // Maps a cookie group to the Google Consent Mode v2 signals it grants.
     // consent-mode.js reads this straight through — no Google-specific PHP.
+    'log' => [
+        // How long the server-side proof of consent is kept. Storage
+        // limitation (RGPD Art. 5º(1)(e)) — run `cookie-consent:prune` daily
+        // so this is actually enforced.
+        'retention_days' => 395, // 13 months
+    ],
+
     'consent_mode' => [
         'necessary' => ['security_storage'],
         'analytics' => ['analytics_storage'],

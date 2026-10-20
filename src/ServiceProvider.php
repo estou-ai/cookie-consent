@@ -2,6 +2,9 @@
 
 namespace Estouai\CookieConsent;
 
+use Estouai\CookieConsent\Console\ExportConsentLog;
+use Estouai\CookieConsent\Console\PruneConsentLog;
+use Illuminate\Console\Scheduling\Schedule;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Permission;
 use Statamic\Providers\AddonServiceProvider;
@@ -15,6 +18,11 @@ class ServiceProvider extends AddonServiceProvider
     // registration, same as it already loading `addon.js` here too.
     protected $vite = [
         'input' => ['resources/js/addon.js', 'resources/js/cp.js'],
+    ];
+
+    protected $commands = [
+        PruneConsentLog::class,
+        ExportConsentLog::class,
     ];
 
     protected $routes = [
@@ -48,6 +56,17 @@ class ServiceProvider extends AddonServiceProvider
     public function bootAddon()
     {
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'cookie-consent');
+
+        // Self-scheduled: storage limitation is the addon's own obligation, not
+        // something to leave to whoever installs it remembering a README line.
+        if (config('cookie-consent.log.retention_days')) {
+            $this->callAfterResolving(Schedule::class, function (Schedule $schedule) {
+                $schedule->command(PruneConsentLog::class)
+                    ->daily()
+                    ->onOneServer()
+                    ->runInBackground();
+            });
+        }
 
         Permission::register('manage cookie consent settings')
             ->label('Manage Cookie Consent Settings')

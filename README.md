@@ -21,7 +21,8 @@ The public banner includes a small `Powered by estou.ai` attribution.
 - Inline Consent Mode defaults for `<head>` before GTM/gtag.js loads.
 - Generic `data-cookie-category` script and iframe gating for non-Google vendors.
 - Content gating tags for Antlers templates.
-- Server-side JSONL consent log for RGPD Art. 7º(1) / LGPD Art. 8º proof.
+- Server-side JSONL consent log for RGPD Art. 7º(1) / LGPD Art. 8º proof, with
+  automatic retention pruning and CSV export.
 - Global Privacy Control auto opt-out.
 - Equal prominence accept/reject buttons.
 - Shadow DOM styling with `::part()` hooks.
@@ -319,8 +320,60 @@ jq -c 'select(.groups | index("marketing"))' storage/app/cookie-consent/*/*.json
 ```
 
 The endpoint is CSRF-exempt because static-cached pages may not have a CSRF
-cookie to send. It is throttled at 60 requests/minute per IP. Prune or rotate
-old logs according to your retention policy.
+cookie to send. It is throttled at 60 requests/minute per IP.
+
+### Retention
+
+Keeping the log forever breaks storage limitation (RGPD Art. 5º(1)(e)), so the
+addon prunes it for you. Nothing to wire up — it registers its own daily task:
+
+```php
+// config/cookie-consent.php
+'log' => [
+    'retention_days' => 395, // 13 months
+],
+```
+
+The day is the file name, so pruning is a file delete — nothing is rewritten.
+Set `retention_days` to `null` to keep everything and turn the task off.
+
+This relies on Laravel's scheduler running at all, which needs the usual cron
+entry on the server:
+
+```text
+* * * * * cd /path/to/site && php artisan schedule:run >> /dev/null 2>&1
+```
+
+To prune by hand, or to see what a different window would remove:
+
+```bash
+php please cookie-consent:prune
+php please cookie-consent:prune --days=90 --dry-run
+```
+
+### Export
+
+For an authority or legal request, export the range as CSV:
+
+```bash
+php please cookie-consent:export storage/app/consent-2026.csv --from=2026-01-01 --to=2026-12-31
+php please cookie-consent:export /tmp/fr.csv --site=fr
+```
+
+Both commands stream line by line, so a year of logs never lands in memory.
+
+### What the log can and cannot prove
+
+It demonstrates **that** consent was collected, with the timestamp, the banner
+version and the groups accepted. It is not searchable by data subject: `ip_hash`
+is a one-way hash of IP + `APP_KEY`, and a visitor does not know the IP they
+browsed from months ago. Rotating `APP_KEY` also breaks correlation between old
+and new hashes. Treat the log as aggregate accountability evidence, not as a
+register for Art. 15/17 access and erasure requests.
+
+The beacon is best-effort by design — a failed request never blocks or reverses
+the visitor's decision — so if the endpoint breaks, decisions go unlogged
+silently. Monitor it if the log matters to you.
 
 ## JavaScript API
 

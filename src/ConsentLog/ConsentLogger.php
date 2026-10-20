@@ -21,4 +21,39 @@ class ConsentLogger
         File::ensureDirectoryExists(dirname($path));
         File::append($path, json_encode($entry, JSON_UNESCAPED_UNICODE)."\n");
     }
+
+    /**
+     * Every log file, oldest first, as [path => Y-m-d]. The day is the file
+     * name, so retention and date ranges never need to open a file.
+     */
+    public function files(): array
+    {
+        $files = [];
+
+        foreach (File::glob(storage_path('app/cookie-consent/*/*.jsonl')) ?: [] as $path) {
+            $date = basename($path, '.jsonl');
+
+            if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+                $files[$path] = $date;
+            }
+        }
+
+        asort($files);
+
+        return $files;
+    }
+
+    /** Stream the entries of one day's file, so a year never lands in memory. */
+    public function entries(string $path): \Generator
+    {
+        $file = new \SplFileObject($path);
+
+        while (! $file->eof()) {
+            $line = trim((string) $file->fgets());
+
+            if ($line !== '' && ($entry = json_decode($line, true)) !== null) {
+                yield $entry;
+            }
+        }
+    }
 }
